@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ─── Root menu ─────────────────────────────────────────── -->
+    <menuitem id="menu_lims_root"
+              name="LIMS Laboratory"
+              sequence="50"
+              web_icon="lims_lab,static/description/icon.png"
+              groups="lims_lab.group_lims_technician"/>
+
+    <!-- ─── Dashboard ─────────────────────────────────────────── -->
+    <menuitem id="menu_lims_dashboard"
+              name="Dashboard"
+              parent="menu_lims_root"
+              sequence="1"
+              action="action_lims_sample"/>
+
+    <!-- ─── Reception / Samples ───────────────────────────────── -->
+    <menuitem id="menu_lims_reception"
+              name="Reception"
+              parent="menu_lims_root"
+              sequence="10"/>
+
+    <menuitem id="menu_lims_request"
+              name="Analysis Requests"
+              parent="menu_lims_reception"
+              action="action_lims_request"
+              sequence="10"/>
+
+    <menuitem id="menu_lims_sample"
+              name="Samples"
+              parent="menu_lims_reception"
+              action="action_lims_sample"
+              sequence="20"/>
+
+    <!-- ─── Analyses ──────────────────────────────────────────── -->
+    <menuitem id="menu_lims_analysis_root"
+              name="Analyses"
+              parent="menu_lims_root"
+              sequence="20"/>
+
+    <menuitem id="menu_lims_analysis"
+              name="All Analyses"
+              parent="menu_lims_analysis_root"
+              action="action_lims_analysis"
+              sequence="10"/>
+
+    <menuitem id="menu_lims_result"
+              name="Measurement Results"
+              parent="menu_lims_analysis_root"
+              action="action_lims_result"
+              sequence="20"
+              groups="lims_lab.group_lims_analyst"/>
+
+    <!-- ─── Quality & Conformity ──────────────────────────────── -->
+    <menuitem id="menu_lims_quality_root"
+              name="Quality"
+              parent="menu_lims_root"
+              sequence="30"
+              groups="lims_lab.group_lims_quality"/>
+
+    <menuitem id="menu_lims_nonconformity"
+              name="Non-Conformities / CAPA"
+              parent="menu_lims_quality_root"
+              action="action_lims_nonconformity"
+              sequence="10"/>
+
+    <!-- ─── Reference Data ────────────────────────────────────── -->
+    <menuitem id="menu_lims_config_root"
+              name="Reference Data"
+              parent="menu_lims_root"
+              sequence="40"
+              groups="lims_lab.group_lims_analyst"/>
+
+    <menuitem id="menu_lims_parameter"
+              name="Analysis Parameters"
+              parent="menu_lims_config_root"
+              action="action_lims_parameter"
+              sequence="10"/>
+
+    <menuitem id="menu_lims_method"
+              name="Analytical Methods"
+              parent="menu_lims_config_root"
+              action="action_lims_method"
+              sequence="20"/>
+
+    <menuitem id="menu_lims_equipment"
+              name="Equipment"
+              parent="menu_lims_config_root"
+              action="action_lims_equipment"
+              sequence="30"/>
+
+    <menuitem id="menu_lims_matrix"
+              name="Matrices"
+              parent="menu_lims_config_root"
+              action="action_lims_matrix"
+              sequence="40"/>
+
+    <!-- ─── Configuration ─────────────────────────────────────── -->
+    <menuitem id="menu_lims_settings_root"
+              name="Configuration"
+              parent="menu_lims_root"
+              sequence="99"
+              groups="lims_lab.group_lims_manager"/>
+
+    <menuitem id="menu_lims_unit"
+              name="Units of Measure"
+              parent="menu_lims_settings_root"
+              action="action_lims_unit"
+              sequence="10"/>
+
+    <menuitem id="menu_lims_parameter_category"
+              name="Parameter Categories"
+              parent="menu_lims_settings_root"
+              action="action_lims_parameter_category"
+              sequence="20"/>
+</odoo>

@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ─── Form view ─────────────────────────────────────────── -->
+    <record id="view_lims_sample_form" model="ir.ui.view">
+        <field name="name">lims.sample.form</field>
+        <field name="model">lims.sample</field>
+        <field name="arch" type="xml">
+            <form string="Sample">
+                <header>
+                    <button name="action_receive" string="Receive" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_start_analysis" string="Start Analyses" type="object"
+                            class="btn-primary" invisible="state != 'received'"/>
+                    <button name="action_validate" string="Validate Results" type="object"
+                            class="btn-primary" invisible="state != 'results_ready'"/>
+                    <button name="action_report" string="Issue Report" type="object"
+                            class="btn-primary" invisible="state != 'validated'"/>
+                    <button name="action_print_certificate" string="Print Certificate" type="object"
+                            invisible="state not in ['validated', 'reported']"/>
+                    <button name="action_create_invoice" string="Create Invoice" type="object"
+                            invisible="state not in ['validated', 'reported'] or is_invoiced"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ['cancelled', 'reported']"
+                            confirm="Are you sure you want to cancel this sample?"/>
+                    <button name="action_reset_draft" string="Reset to Draft" type="object"
+                            invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,received,in_progress,results_ready,validated,reported"/>
+                </header>
+
+                <sheet>
+                    <!-- Alerts -->
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not is_overdue">
+                        ⚠️ This sample is overdue (due date passed).
+                    </div>
+                    <div class="alert alert-info" role="alert" invisible="not is_urgent">
+                        🔴 URGENT sample
+                    </div>
+
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_analyses" type="object"
+                                class="oe_stat_button" icon="fa-flask">
+                            <field name="analysis_count" widget="statinfo" string="Analyses"/>
+                        </button>
+                        <button name="%(action_lims_certificate_report)s" type="action"
+                                class="oe_stat_button" icon="fa-file-pdf-o"
+                                invisible="state not in ['validated','reported']">
+                            <span>Certificate</span>
+                        </button>
+                    </div>
+
+                    <!-- Conformity ribbon -->
+                    <widget name="web_ribbon" title="Conform" bg_color="bg-success"
+                            invisible="conformity_state != 'conform'"/>
+                    <widget name="web_ribbon" title="Non Conform" bg_color="bg-danger"
+                            invisible="conformity_state != 'non_conform'"/>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Identification">
+                            <field name="barcode" widget="char" placeholder="Scan or enter the barcode"/>
+                            <field name="external_ref" placeholder="Customer reference"/>
+                            <field name="sample_type_id"/>
+                            <field name="matrix_id"/>
+                            <field name="is_urgent" widget="boolean_toggle"/>
+                        </group>
+                        <group string="Customer">
+                            <field name="partner_id"/>
+                            <field name="request_id"/>
+                            <field name="sale_order_id" readonly="1"/>
+                            <field name="invoice_id" readonly="1"/>
+                            <field name="is_invoiced" widget="boolean" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Sampling">
+                            <field name="sampling_date"/>
+                            <field name="sampling_location"/>
+                            <field name="sampler_id"/>
+                        </group>
+                        <group string="Reception">
+                            <field name="date_reception"/>
+                            <field name="received_by"/>
+                            <field name="condition_reception"/>
+                            <field name="condition_note" invisible="condition_reception == 'good'"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Deadlines">
+                            <field name="date_due"/>
+                            <field name="date_results" readonly="1"/>
+                        </group>
+                        <group string="Storage">
+                            <field name="storage_location"/>
+                            <field name="storage_temp"/>
+                            <field name="disposal_date"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <!-- Analyses -->
+                        <page string="Analyses" name="analyses">
+                            <field name="analysis_ids" mode="list">
+                                <list string="Analyses" editable="bottom">
+                                    <field name="name" readonly="1"/>
+                                    <field name="parameter_id"/>
+                                    <field name="method_id"/>
+                                    <field name="analyst_id"/>
+                                    <field name="date_planned"/>
+                                    <field name="final_value"/>
+                                    <field name="unit_id" readonly="1"/>
+                                    <field name="conformity_state" widget="badge"
+                                           decoration-success="conformity_state == 'conform'"
+                                           decoration-danger="conformity_state == 'non_conform'"
+                                           decoration-warning="conformity_state == 'pending'"
+                                           decoration-info="conformity_state == 'below_lod'"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'validated'"
+                                           decoration-info="state == 'in_progress'"
+                                           decoration-muted="state == 'draft'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- Chain of custody -->
+                        <page string="Chain of Custody" name="custody">
+                            <field name="custody_log_ids" readonly="1">
+                                <list string="Custody Log">
+                                    <field name="date"/>
+                                    <field name="user_id"/>
+                                    <field name="action"/>
+                                    <field name="location_from"/>
+                                    <field name="location_to"/>
+                                    <field name="notes"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- Notes -->
+                        <page string="Internal Notes" name="notes">
+                            <field name="note" placeholder="Internal notes..."/>
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ─── List view ─────────────────────────────────────────── -->
+    <record id="view_lims_sample_list" model="ir.ui.view">
+        <field name="name">lims.sample.list</field>
+        <field name="model">lims.sample</field>
+        <field name="arch" type="xml">
+            <list string="Samples" decoration-danger="is_overdue"
+                  decoration-warning="is_urgent and not is_overdue">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="sample_type_id"/>
+                <field name="matrix_id"/>
+                <field name="date_reception"/>
+                <field name="date_due"/>
+                <field name="analysis_count" string="Analyses"/>
+                <field name="conformity_state" widget="badge"
+                       decoration-success="conformity_state == 'conform'"
+                       decoration-danger="conformity_state == 'non_conform'"
+                       decoration-warning="conformity_state == 'pending'"/>
+                <field name="state" widget="badge"
+                       decoration-success="state in ['validated', 'reported']"
+                       decoration-info="state == 'in_progress'"
+                       decoration-warning="state == 'results_ready'"/>
+                <field name="is_urgent" widget="boolean" optional="hide"/>
+                <field name="is_overdue" widget="boolean" optional="hide"/>
+                <field name="is_invoiced" widget="boolean" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ─── Kanban view ───────────────────────────────────────── -->
+    <record id="view_lims_sample_kanban" model="ir.ui.view">
+        <field name="name">lims.sample.kanban</field>
+        <field name="model">lims.sample</field>
+        <field name="arch" type="xml">
+            <kanban string="Samples" default_group_by="state"
+                    class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="matrix_id"/>
+                <field name="date_due"/>
+                <field name="conformity_state"/>
+                <field name="state"/>
+                <field name="is_urgent"/>
+                <field name="is_overdue"/>
+                <field name="analysis_count"/>
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="oe_kanban_card #{record.is_urgent.raw_value ? 'border-danger' : ''} #{record.is_overdue.raw_value ? 'border-warning' : ''}">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                    </div>
+                                    <small t-if="record.is_urgent.raw_value" class="badge text-bg-danger">URGENT</small>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <div><field name="partner_id"/></div>
+                                    <div class="text-muted"><field name="matrix_id"/></div>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <span t-if="record.date_due.raw_value">
+                                            📅 <field name="date_due"/>
+                                        </span>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="conformity_state" widget="label_selection"
+                                               options="{'classes': {'conform': 'success', 'non_conform': 'danger', 'pending': 'warning'}}"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ─── Search view ───────────────────────────────────────── -->
+    <record id="view_lims_sample_search" model="ir.ui.view">
+        <field name="name">lims.sample.search</field>
+        <field name="model">lims.sample</field>
+        <field name="arch" type="xml">
+            <search string="Search a sample">
+                <field name="name" string="Reference"/>
+                <field name="barcode" string="Barcode"/>
+                <field name="partner_id" string="Customer"/>
+                <field name="external_ref" string="External Ref."/>
+                <separator/>
+                <filter name="urgent" string="Urgent" domain="[('is_urgent', '=', True)]"/>
+                <filter name="overdue" string="Overdue" domain="[('is_overdue', '=', True)]"/>
+                <filter name="non_conform" string="Non Conform" domain="[('conformity_state', '=', 'non_conform')]"/>
+                <filter name="not_invoiced" string="Not Invoiced" domain="[('is_invoiced', '=', False), ('state', 'in', ['validated','reported'])]"/>
+                <separator/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="in_progress" string="In Progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter name="results_ready" string="Results Ready" domain="[('state', '=', 'results_ready')]"/>
+                <filter name="validated" string="Validated" domain="[('state', '=', 'validated')]"/>
+                <separator/>
+                <group>
+                    <filter name="group_partner" string="Customer" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_matrix" string="Matrix" context="{'group_by': 'matrix_id'}"/>
+                    <filter name="group_month" string="Reception Month" context="{'group_by': 'date_reception:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ─── Action ────────────────────────────────────────────── -->
+    <record id="action_lims_sample" model="ir.actions.act_window">
+        <field name="name">Samples</field>
+        <field name="res_model">lims.sample</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="view_lims_sample_search"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Receive your first sample
+            </p>
+            <p>Click "New" to create a sample and start the analysis process.</p>
+        </field>
+    </record>
+</odoo>

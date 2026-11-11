@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ─── Privilege (v19: groups are categorized via res.groups.privilege) ─ -->
+    <record id="privilege_lims" model="res.groups.privilege">
+        <field name="name">LIMS</field>
+        <field name="category_id" ref="lims_lab.module_lims_category"/>
+    </record>
+
+    <!-- ─── Groups ────────────────────────────────────────────── -->
+    <!-- Laboratory technician -->
+    <record id="group_lims_technician" model="res.groups">
+        <field name="name">Technician</field>
+        <field name="privilege_id" ref="lims_lab.privilege_lims"/>
+        <field name="comment">Can enter results and manage samples.</field>
+    </record>
+
+    <!-- Analyst / Validator -->
+    <record id="group_lims_analyst" model="res.groups">
+        <field name="name">Analyst / Validator</field>
+        <field name="privilege_id" ref="lims_lab.privilege_lims"/>
+        <field name="implied_ids" eval="[(4, ref('group_lims_technician'))]"/>
+        <field name="comment">Can validate results and issue reports.</field>
+    </record>
+
+    <!-- Quality manager -->
+    <record id="group_lims_quality" model="res.groups">
+        <field name="name">Quality Manager</field>
+        <field name="privilege_id" ref="lims_lab.privilege_lims"/>
+        <field name="implied_ids" eval="[(4, ref('group_lims_analyst'))]"/>
+        <field name="comment">Manages non-conformities, CAPA and ISO 17025 compliance.</field>
+    </record>
+
+    <!-- LIMS Manager -->
+    <record id="group_lims_manager" model="res.groups">
+        <field name="name">LIMS Manager</field>
+        <field name="privilege_id" ref="lims_lab.privilege_lims"/>
+        <field name="implied_ids" eval="[(4, ref('group_lims_quality'))]"/>
+        <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        <field name="comment">Full access to all LIMS modules.</field>
+    </record>
+</odoo>

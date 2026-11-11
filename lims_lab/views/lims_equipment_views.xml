@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_lims_equipment_form" model="ir.ui.view">
+        <field name="name">lims.equipment.form</field>
+        <field name="model">lims.equipment</field>
+        <field name="arch" type="xml">
+            <form string="Laboratory Equipment">
+                <sheet>
+                    <widget name="web_ribbon" title="To Calibrate" bg_color="bg-warning"
+                            invisible="metrological_state != 'to_calibrate'"/>
+                    <widget name="web_ribbon" title="Out of Service" bg_color="bg-danger"
+                            invisible="metrological_state != 'out_of_service'"/>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                        <h3 class="text-muted"><field name="reference" placeholder="Internal reference"/></h3>
+                    </div>
+                    <group>
+                        <group string="Identification">
+                            <field name="equipment_type"/>
+                            <field name="brand"/>
+                            <field name="model"/>
+                            <field name="serial_number"/>
+                            <field name="location"/>
+                            <field name="responsible_id"/>
+                        </group>
+                        <group string="Status">
+                            <field name="state" widget="radio"/>
+                            <field name="metrological_state" readonly="1" widget="badge"
+                                   decoration-success="metrological_state == 'ok'"
+                                   decoration-warning="metrological_state in ['to_calibrate','to_verify']"
+                                   decoration-danger="metrological_state in ['out_of_service','repair']"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Calibration (ISO 17025)">
+                            <group>
+                                <group string="Calibration">
+                                    <field name="last_calibration_date"/>
+                                    <field name="calibration_interval"/>
+                                    <field name="next_calibration_date" readonly="1"/>
+                                    <field name="calibration_body"/>
+                                    <field name="calibration_certificate"/>
+                                </group>
+                                <group string="Periodic Verification">
+                                    <field name="last_verification_date"/>
+                                    <field name="verification_interval"/>
+                                    <field name="next_verification_date" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Documents">
+                            <field name="document_ids" widget="many2many_binary"/>
+                        </page>
+                        <page string="Notes">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_lims_equipment_list" model="ir.ui.view">
+        <field name="name">lims.equipment.list</field>
+        <field name="model">lims.equipment</field>
+        <field name="arch" type="xml">
+            <list string="Equipment"
+                  decoration-warning="metrological_state in ['to_calibrate','to_verify']"
+                  decoration-danger="metrological_state == 'out_of_service'">
+                <field name="name"/>
+                <field name="reference"/>
+                <field name="equipment_type"/>
+                <field name="brand"/>
+                <field name="serial_number" optional="show"/>
+                <field name="location"/>
+                <field name="next_calibration_date"/>
+                <field name="metrological_state" widget="badge"
+                       decoration-success="metrological_state == 'ok'"
+                       decoration-warning="metrological_state in ['to_calibrate','to_verify']"
+                       decoration-danger="metrological_state in ['out_of_service','repair']"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'active'"
+                       decoration-danger="state == 'out_of_service'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_lims_equipment_search" model="ir.ui.view">
+        <field name="name">lims.equipment.search</field>
+        <field name="model">lims.equipment</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="reference"/>
+                <field name="serial_number"/>
+                <filter name="to_calibrate" string="To Calibrate"
+                        domain="[('metrological_state','=','to_calibrate')]"/>
+                <filter name="to_verify" string="To Verify"
+                        domain="[('metrological_state','=','to_verify')]"/>
+                <filter name="out_of_service" string="Out of Service"
+                        domain="[('state','=','out_of_service')]"/>
+                <group>
+                    <filter name="group_type" string="Type" context="{'group_by': 'equipment_type'}"/>
+                    <filter name="group_state" string="Metrological Status"
+                            context="{'group_by': 'metrological_state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_lims_equipment" model="ir.actions.act_window">
+        <field name="name">Equipment</field>
+        <field name="res_model">lims.equipment</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_lims_equipment_search"/>
+    </record>
+</odoo>

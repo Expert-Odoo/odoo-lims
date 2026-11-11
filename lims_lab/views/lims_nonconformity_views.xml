@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_lims_nc_form" model="ir.ui.view">
+        <field name="name">lims.nonconformity.form</field>
+        <field name="model">lims.nonconformity</field>
+        <field name="arch" type="xml">
+            <form string="Non-Conformity / CAPA">
+                <header>
+                    <button name="action_start_treatment" string="Take Charge" type="object"
+                            class="btn-primary" invisible="state != 'open'"/>
+                    <button name="action_define_capa" string="Define CAPA" type="object"
+                            class="btn-primary" invisible="state != 'in_progress'"/>
+                    <button name="action_implement_capa" string="CAPA Implemented" type="object"
+                            class="btn-primary" invisible="state != 'capa_defined'"/>
+                    <button name="action_verify" string="Verify Effectiveness" type="object"
+                            class="btn-primary" invisible="state != 'capa_implemented'"/>
+                    <button name="action_close" string="Close" type="object"
+                            class="btn-success"
+                            groups="lims_lab.group_lims_quality"
+                            invisible="state != 'verification'"/>
+                    <button name="action_reopen" string="Reopen" type="object"
+                            invisible="state != 'closed'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="open,in_progress,capa_defined,capa_implemented,verification,closed"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Critical" bg_color="bg-danger"
+                            invisible="severity != 'critical'"/>
+                    <widget name="web_ribbon" title="Closed" bg_color="bg-success"
+                            invisible="state != 'closed'"/>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                        <h2><field name="title" placeholder="Non-conformity title"/></h2>
+                    </div>
+                    <group>
+                        <group string="Classification">
+                            <field name="nc_type"/>
+                            <field name="severity" widget="priority"/>
+                            <field name="date_detected"/>
+                            <field name="detected_by"/>
+                        </group>
+                        <group string="Related Items">
+                            <field name="sample_id"/>
+                            <field name="analysis_id"
+                                   domain="[('sample_id', '=', sample_id)]"/>
+                            <field name="equipment_id"/>
+                            <field name="method_id"/>
+                            <field name="partner_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description &amp; Cause">
+                            <group string="Non-conformity Description">
+                                <field name="description" nolabel="1"/>
+                            </group>
+                            <group string="Root Cause">
+                                <field name="root_cause" nolabel="1"/>
+                            </group>
+                        </page>
+                        <page string="Immediate Action">
+                            <group>
+                                <field name="immediate_action"/>
+                                <field name="immediate_action_date"/>
+                                <field name="immediate_action_by"/>
+                            </group>
+                        </page>
+                        <page string="CAPA">
+                            <group string="Corrective Action">
+                                <field name="corrective_action" nolabel="1"/>
+                            </group>
+                            <group string="Preventive Action">
+                                <field name="preventive_action" nolabel="1"/>
+                            </group>
+                            <group>
+                                <field name="action_due_date"/>
+                                <field name="action_responsible"/>
+                            </group>
+                        </page>
+                        <page string="Effectiveness Check">
+                            <group>
+                                <field name="effectiveness_check"/>
+                                <field name="effectiveness_date"/>
+                                <field name="effectiveness_by"/>
+                                <field name="is_effective" widget="boolean_toggle"/>
+                            </group>
+                            <group string="Closure" invisible="state != 'closed'">
+                                <field name="date_closed" readonly="1"/>
+                                <field name="closed_by" readonly="1"/>
+                                <field name="closure_note"/>
+                            </group>
+                        </page>
+                        <page string="Documents">
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_lims_nc_list" model="ir.ui.view">
+        <field name="name">lims.nonconformity.list</field>
+        <field name="model">lims.nonconformity</field>
+        <field name="arch" type="xml">
+            <list string="Non-Conformities"
+                  decoration-danger="severity == 'critical'"
+                  decoration-warning="severity == 'major'">
+                <field name="name"/>
+                <field name="title"/>
+                <field name="nc_type"/>
+                <field name="severity" widget="priority"/>
+                <field name="date_detected"/>
+                <field name="detected_by"/>
+                <field name="action_due_date"/>
+                <field name="action_responsible"/>
+                <field name="state" widget="badge"
+                       decoration-danger="state == 'open'"
+                       decoration-warning="state in ['in_progress','capa_defined']"
+                       decoration-success="state == 'closed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_lims_nc_search" model="ir.ui.view">
+        <field name="name">lims.nonconformity.search</field>
+        <field name="model">lims.nonconformity</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="title"/>
+                <filter name="open" string="Open" domain="[('state','=','open')]"/>
+                <filter name="critical" string="Critical" domain="[('severity','=','critical')]"/>
+                <filter name="overdue_capa" string="Overdue CAPA"
+                        domain="[('action_due_date','&lt;', context_today()), ('state','not in',['closed','verification'])]"/>
+                <filter name="my_nc" string="My NCs"
+                        domain="[('action_responsible','=',uid)]"/>
+                <group>
+                    <filter name="group_type" string="Type" context="{'group_by': 'nc_type'}"/>
+                    <filter name="group_severity" string="Severity" context="{'group_by': 'severity'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_lims_nonconformity" model="ir.actions.act_window">
+        <field name="name">Non-Conformities / CAPA</field>
+        <field name="res_model">lims.nonconformity</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_lims_nc_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No non-conformity recorded</p>
+            <p>Create a non-conformity to start the CAPA process.</p>
+        </field>
+    </record>
+</odoo>

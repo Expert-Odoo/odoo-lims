@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_lims_certificate">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+
+                        <!-- ═══ CERTIFICATE HEADER ═══════════════════════ -->
+                        <div class="row mb-4">
+                            <div class="col-8">
+                                <h2 class="text-primary">
+                                    CERTIFICATE OF ANALYSIS
+                                </h2>
+                                <h4 class="text-muted">
+                                    No. <t t-esc="o.name"/>
+                                </h4>
+                            </div>
+                            <div class="col-4 text-end">
+                                <t t-if="o.sample_type_id">
+                                    <span class="badge bg-secondary fs-6">
+                                        <t t-esc="o.matrix_id.name or ''"/>
+                                    </span>
+                                </t>
+                                <br/>
+                                <small class="text-muted">Issued on:
+                                    <t t-esc="(o.date_results or fields.Datetime.now()).strftime('%Y-%m-%d')"/>
+                                </small>
+                            </div>
+                        </div>
+
+                        <hr/>
+
+                        <!-- ═══ CUSTOMER INFORMATION ═════════════════════ -->
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <h5>CUSTOMER</h5>
+                                <address>
+                                    <strong><t t-esc="o.partner_id.name"/></strong><br/>
+                                    <t t-if="o.partner_id.street">
+                                        <t t-esc="o.partner_id.street"/><br/>
+                                    </t>
+                                    <t t-if="o.partner_id.zip or o.partner_id.city">
+                                        <t t-esc="o.partner_id.zip or ''"/>
+                                        <t t-esc="o.partner_id.city or ''"/>
+                                    </t>
+                                </address>
+                            </div>
+                            <div class="col-6">
+                                <h5>SAMPLE</h5>
+                                <table class="table table-sm table-borderless">
+                                    <tr>
+                                        <td class="text-muted">Lab reference:</td>
+                                        <td><strong><t t-esc="o.name"/></strong></td>
+                                    </tr>
+                                    <tr t-if="o.external_ref">
+                                        <td class="text-muted">Customer ref.:</td>
+                                        <td><t t-esc="o.external_ref"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Type:</td>
+                                        <td><t t-esc="o.sample_type_id.name or '-'"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Matrix:</td>
+                                        <td><t t-esc="o.matrix_id.name or '-'"/></td>
+                                    </tr>
+                                    <tr t-if="o.sampling_date">
+                                        <td class="text-muted">Sampling date:</td>
+                                        <td><t t-esc="o.sampling_date.strftime('%Y-%m-%d %H:%M')"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Reception date:</td>
+                                        <td><t t-esc="o.date_reception.strftime('%Y-%m-%d %H:%M') if o.date_reception else '-'"/></td>
+                                    </tr>
+                                    <tr t-if="o.sampling_location">
+                                        <td class="text-muted">Location:</td>
+                                        <td><t t-esc="o.sampling_location"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ═══ ANALYSIS RESULTS ═══════════════════════ -->
+                        <h5 class="mt-4 mb-2">ANALYSIS RESULTS</h5>
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Method</th>
+                                    <th class="text-center">Result</th>
+                                    <th class="text-center">Unit</th>
+                                    <th class="text-center">Min Limit</th>
+                                    <th class="text-center">Max Limit</th>
+                                    <th class="text-center">Uncertainty</th>
+                                    <th class="text-center">Conformity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.analysis_ids.filtered(lambda a: a.state == 'validated')" t-as="ana">
+                                    <tr t-attf-class="#{ana.conformity_state == 'non_conform' and 'table-danger' or ana.conformity_state == 'conform' and '' or 'table-warning'}">
+                                        <td>
+                                            <strong><t t-esc="ana.parameter_id.name"/></strong>
+                                            <t t-if="ana.parameter_id.is_accredited">
+                                                <span class="badge bg-success ms-1" style="font-size:8px" t-esc="ana.method_id.accreditation_body or 'Accredited'"/>
+                                            </t>
+                                        </td>
+                                        <td><small><t t-esc="ana.method_id.code or '-'"/></small></td>
+                                        <td class="text-center">
+                                            <t t-if="ana.is_qualitative">
+                                                <t t-esc="dict(ana._fields['qualitative_result'].selection).get(ana.qualitative_result, '-')"/>
+                                            </t>
+                                            <t t-else="">
+                                                <t t-if="ana.final_value_char">
+                                                    <t t-esc="ana.final_value_char"/>
+                                                </t>
+                                                <t t-else="">
+                                                    <t t-esc="'%.4g' % ana.final_value if ana.final_value else '-'"/>
+                                                </t>
+                                            </t>
+                                        </td>
+                                        <td class="text-center"><t t-esc="ana.unit_id.symbol or '-'"/></td>
+                                        <td class="text-center">
+                                            <t t-esc="'%.4g' % ana.limit_min if ana.limit_min else '-'"/>
+                                        </td>
+                                        <td class="text-center">
+                                            <t t-esc="'%.4g' % ana.limit_max if ana.limit_max else '-'"/>
+                                        </td>
+                                        <td class="text-center">
+                                            <t t-if="ana.uncertainty">
+                                                ± <t t-esc="'%.3g' % ana.uncertainty"/>
+                                                <t t-esc="ana.uncertainty_unit.symbol or ''"/>
+                                            </t>
+                                            <t t-else="">-</t>
+                                        </td>
+                                        <td class="text-center">
+                                            <t t-if="ana.conformity_state == 'conform'">
+                                                <span class="badge bg-success">✓ Conform</span>
+                                            </t>
+                                            <t t-elif="ana.conformity_state == 'non_conform'">
+                                                <span class="badge bg-danger">✗ Non Conform</span>
+                                            </t>
+                                            <t t-elif="ana.conformity_state == 'below_lod'">
+                                                <span class="badge bg-info">&lt; LOD</span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="badge bg-secondary">N/A</span>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- ═══ CONCLUSION ════════════════════════════════ -->
+                        <div class="mt-4 p-3 border rounded">
+                            <h6>OVERALL CONCLUSION</h6>
+                            <t t-if="o.conformity_state == 'conform'">
+                                <p class="text-success mb-0">
+                                    <strong>✓ The sample is CONFORM</strong> to all the defined acceptance criteria.
+                                </p>
+                            </t>
+                            <t t-elif="o.conformity_state == 'non_conform'">
+                                <p class="text-danger mb-0">
+                                    <strong>✗ The sample is NON CONFORM</strong> — one or more parameters exceed the set limits.
+                                </p>
+                            </t>
+                            <t t-else="">
+                                <p class="text-muted mb-0">
+                                    Partial results or pending validation.
+                                </p>
+                            </t>
+                        </div>
+
+                        <!-- ═══ SIGNATURE ═════════════════════════════════ -->
+                        <div class="row mt-5">
+                            <div class="col-6">
+                                <p class="text-muted">Validated by:</p>
+                                <t t-set="validators" t-value="o.analysis_ids.mapped('validator_id')"/>
+                                <t t-if="validators">
+                                    <strong><t t-esc="validators[0].name"/></strong><br/>
+                                    <small><t t-esc="validators[0].job_title or 'Validating Analyst'"/></small>
+                                </t>
+                                <br/><br/>
+                                <p>Signature: ___________________________</p>
+                            </div>
+                            <div class="col-6 text-end">
+                                <p class="text-muted small">
+                                    This certificate may only be reproduced in full.<br/>
+                                    The results relate only to the sample submitted for analysis.
+                                    <t t-if="o.analysis_ids.filtered(lambda a: a.parameter_id.is_accredited)">
+                                        <br/><span class="badge bg-success">Accredited</span>
+                                        The marked parameters are covered by the laboratory's ISO/IEC 17025 accreditation.
+                                    </t>
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

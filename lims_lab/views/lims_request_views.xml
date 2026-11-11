@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_lims_request_form" model="ir.ui.view">
+        <field name="name">lims.request.form</field>
+        <field name="model">lims.request</field>
+        <field name="arch" type="xml">
+            <form string="Analysis Request">
+                <header>
+                    <button name="action_confirm" string="Confirm" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_create_samples" string="Create Samples" type="object"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_create_quotation" string="Create Quotation" type="object"
+                            invisible="state not in ['confirmed','in_progress'] or sale_order_id != False"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ['completed','cancelled']"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,confirmed,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_samples" type="object"
+                                class="oe_stat_button" icon="fa-flask">
+                            <field name="sample_count" widget="statinfo" string="Samples"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Customer">
+                            <field name="partner_id"/>
+                            <field name="contact_id"/>
+                        </group>
+                        <group string="Request">
+                            <field name="date_request"/>
+                            <field name="date_due"/>
+                            <field name="request_type"/>
+                            <field name="is_urgent" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="description" placeholder="Request description..."/>
+                        <field name="special_instructions" placeholder="Special instructions..."/>
+                    </group>
+                    <notebook>
+                        <page string="Requested Parameters">
+                            <field name="request_line_ids">
+                                <list editable="bottom" string="Lines">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="parameter_id"/>
+                                    <field name="method_id"
+                                           domain="[('id','in',parameter_id.method_ids)]"/>
+                                    <field name="quantity"/>
+                                    <field name="price_unit"/>
+                                    <field name="price_subtotal" readonly="1"/>
+                                    <field name="note"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer">
+                                <field name="amount_total" readonly="1"
+                                       widget="monetary" string="Estimated Amount"/>
+                            </group>
+                        </page>
+                        <page string="Quotation / Order">
+                            <group>
+                                <field name="sale_order_id" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_lims_request_list" model="ir.ui.view">
+        <field name="name">lims.request.list</field>
+        <field name="model">lims.request</field>
+        <field name="arch" type="xml">
+            <list string="Analysis Requests"
+                  decoration-warning="is_urgent">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="date_request"/>
+                <field name="date_due"/>
+                <field name="request_type"/>
+                <field name="is_urgent" widget="boolean"/>
+                <field name="sample_count" string="Smp."/>
+                <field name="amount_total" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'completed'"
+                       decoration-info="state == 'in_progress'"
+                       decoration-muted="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_lims_request" model="ir.actions.act_window">
+        <field name="name">Analysis Requests</field>
+        <field name="res_model">lims.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No analysis request</p>
+            <p>Create a request to start the analytical process.</p>
+        </field>
+    </record>
+</odoo>

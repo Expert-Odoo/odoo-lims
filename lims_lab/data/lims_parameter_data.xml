@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- ─── Units of measure ──────────────────────────────── -->
+        <record id="unit_mg_l" model="lims.unit">
+            <field name="name">mg/L</field>
+            <field name="symbol">mg/L</field>
+            <field name="description">Milligrams per liter</field>
+        </record>
+        <record id="unit_ug_l" model="lims.unit">
+            <field name="name">µg/L</field>
+            <field name="symbol">µg/L</field>
+            <field name="description">Micrograms per liter</field>
+        </record>
+        <record id="unit_mg_kg" model="lims.unit">
+            <field name="name">mg/kg</field>
+            <field name="symbol">mg/kg</field>
+            <field name="description">Milligrams per kilogram (dry matter)</field>
+        </record>
+        <record id="unit_percent" model="lims.unit">
+            <field name="name">%</field>
+            <field name="symbol">%</field>
+            <field name="description">Percentage</field>
+        </record>
+        <record id="unit_ntu" model="lims.unit">
+            <field name="name">NTU</field>
+            <field name="symbol">NTU</field>
+            <field name="description">Nephelometric Turbidity Unit</field>
+        </record>
+        <record id="unit_ufc_ml" model="lims.unit">
+            <field name="name">CFU/mL</field>
+            <field name="symbol">CFU/mL</field>
+            <field name="description">Colony Forming Units per milliliter</field>
+        </record>
+        <record id="unit_ph" model="lims.unit">
+            <field name="name">pH</field>
+            <field name="symbol">pH</field>
+        </record>
+        <record id="unit_ms_cm" model="lims.unit">
+            <field name="name">mS/cm</field>
+            <field name="symbol">mS/cm</field>
+            <field name="description">Millisiemens per centimeter (conductivity)</field>
+        </record>
+        <record id="unit_celsius" model="lims.unit">
+            <field name="name">°C</field>
+            <field name="symbol">°C</field>
+        </record>
+        <record id="unit_ppm" model="lims.unit">
+            <field name="name">ppm</field>
+            <field name="symbol">ppm</field>
+        </record>
+
+        <!-- ─── Matrices ──────────────────────────────────────── -->
+        <record id="matrix_water" model="lims.matrix">
+            <field name="name">Water</field>
+            <field name="code">WATER</field>
+            <field name="color">1</field>
+        </record>
+        <record id="matrix_wastewater" model="lims.matrix">
+            <field name="name">Wastewater / Effluent</field>
+            <field name="code">EFF</field>
+            <field name="color">2</field>
+        </record>
+        <record id="matrix_soil" model="lims.matrix">
+            <field name="name">Soil</field>
+            <field name="code">SOIL</field>
+            <field name="color">3</field>
+        </record>
+        <record id="matrix_food" model="lims.matrix">
+            <field name="name">Food</field>
+            <field name="code">FOOD</field>
+            <field name="color">4</field>
+        </record>
+        <record id="matrix_air" model="lims.matrix">
+            <field name="name">Air</field>
+            <field name="code">AIR</field>
+            <field name="color">5</field>
+        </record>
+        <record id="matrix_biological" model="lims.matrix">
+            <field name="name">Biological</field>
+            <field name="code">BIO</field>
+            <field name="color">6</field>
+        </record>
+        <record id="matrix_material" model="lims.matrix">
+            <field name="name">Material / Product</field>
+            <field name="code">MAT</field>
+            <field name="color">7</field>
+        </record>
+
+        <!-- ─── Parameter categories ─────────────────────────── -->
+        <record id="cat_physicochemical" model="lims.parameter.category">
+            <field name="name">Physicochemical</field>
+            <field name="color">1</field>
+        </record>
+        <record id="cat_microbiological" model="lims.parameter.category">
+            <field name="name">Microbiological</field>
+            <field name="color">2</field>
+        </record>
+        <record id="cat_metals" model="lims.parameter.category">
+            <field name="name">Metals and Metalloids</field>
+            <field name="color">3</field>
+        </record>
+        <record id="cat_organics" model="lims.parameter.category">
+            <field name="name">Organic Compounds</field>
+            <field name="color">4</field>
+        </record>
+        <record id="cat_nutrients" model="lims.parameter.category">
+            <field name="name">Nutrients</field>
+            <field name="color">5</field>
+        </record>
+
+        <!-- ─── Sample types ──────────────────────────────────── -->
+        <record id="sample_type_liquid" model="lims.sample.type">
+            <field name="name">Liquid</field>
+            <field name="code">LIQ</field>
+            <field name="default_matrix_id" ref="matrix_water"/>
+        </record>
+        <record id="sample_type_solid" model="lims.sample.type">
+            <field name="name">Solid</field>
+            <field name="code">SOL</field>
+            <field name="default_matrix_id" ref="matrix_soil"/>
+        </record>
+        <record id="sample_type_gas" model="lims.sample.type">
+            <field name="name">Gas</field>
+            <field name="code">GAS</field>
+            <field name="default_matrix_id" ref="matrix_air"/>
+        </record>
+        <record id="sample_type_biological" model="lims.sample.type">
+            <field name="name">Biological / Clinical</field>
+            <field name="code">BIO</field>
+            <field name="default_matrix_id" ref="matrix_biological"/>
+        </record>
+        <record id="sample_type_food" model="lims.sample.type">
+            <field name="name">Food</field>
+            <field name="code">FOOD</field>
+            <field name="default_matrix_id" ref="matrix_food"/>
+        </record>
+    </data>
+</odoo>

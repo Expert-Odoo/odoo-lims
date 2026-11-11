@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_lims_method_form" model="ir.ui.view">
+        <field name="name">lims.method.form</field>
+        <field name="model">lims.method</field>
+        <field name="arch" type="xml">
+            <form string="Analytical Method">
+                <header>
+                    <button name="action_validate" string="Validate" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_obsolete" string="Mark Obsolete" type="object"
+                            invisible="state != 'validated'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,validated,obsolete"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="ISO 17025 Accredited" bg_color="bg-success"
+                            invisible="not is_accredited"/>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                        <h3><field name="code" placeholder="Method reference"/></h3>
+                    </div>
+                    <group>
+                        <group string="Identification">
+                            <field name="method_type"/>
+                            <field name="standard_ref" placeholder="E.g. ISO 7027:2016"/>
+                            <field name="version"/>
+                            <field name="revision_date"/>
+                            <field name="next_review_date"/>
+                            <field name="sop_ref"/>
+                        </group>
+                        <group string="ISO 17025 Accreditation">
+                            <field name="is_accredited" widget="boolean_toggle"/>
+                            <field name="accreditation_number" invisible="not is_accredited"/>
+                            <field name="accreditation_body" invisible="not is_accredited"/>
+                            <field name="accreditation_expiry" invisible="not is_accredited"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Scope">
+                            <group>
+                                <field name="matrix_ids" widget="many2many_tags"/>
+                                <field name="parameter_ids" widget="many2many_tags"/>
+                                <field name="equipment_ids" widget="many2many_tags"/>
+                            </group>
+                        </page>
+                        <page string="Description">
+                            <field name="description"/>
+                        </page>
+                        <page string="Documents">
+                            <field name="document_ids" widget="many2many_binary"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_lims_method_list" model="ir.ui.view">
+        <field name="name">lims.method.list</field>
+        <field name="model">lims.method</field>
+        <field name="arch" type="xml">
+            <list string="Analytical Methods">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="method_type"/>
+                <field name="standard_ref"/>
+                <field name="version"/>
+                <field name="is_accredited" widget="boolean"/>
+                <field name="accreditation_expiry" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'validated'"
+                       decoration-muted="state == 'obsolete'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_lims_method" model="ir.actions.act_window">
+        <field name="name">Analytical Methods</field>
+        <field name="res_model">lims.method</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('active', '=', True)]</field>
+    </record>
+
+    <!-- ─── Matrix ────────────────────────────────────────────── -->
+    <record id="view_lims_matrix_list" model="ir.ui.view">
+        <field name="name">lims.matrix.list</field>
+        <field name="model">lims.matrix</field>
+        <field name="arch" type="xml">
+            <list string="Matrices" editable="bottom">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="description"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_lims_matrix" model="ir.actions.act_window">
+        <field name="name">Matrices</field>
+        <field name="res_model">lims.matrix</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

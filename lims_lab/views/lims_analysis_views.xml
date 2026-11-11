@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_lims_analysis_form" model="ir.ui.view">
+        <field name="name">lims.analysis.form</field>
+        <field name="model">lims.analysis</field>
+        <field name="arch" type="xml">
+            <form string="Analysis">
+                <header>
+                    <button name="action_start" string="Start" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_enter_results" string="Enter Results" type="object"
+                            class="btn-primary" invisible="state != 'in_progress'"/>
+                    <button name="action_validate" string="Validate" type="object"
+                            class="btn-primary"
+                            groups="lims_lab.group_lims_analyst"
+                            invisible="state != 'results_entered'"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ['validated', 'cancelled']"/>
+                    <button name="action_reset" string="Reset" type="object"
+                            invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,in_progress,results_entered,validated"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Conform" bg_color="bg-success"
+                            invisible="conformity_state != 'conform'"/>
+                    <widget name="web_ribbon" title="Non Conform" bg_color="bg-danger"
+                            invisible="conformity_state != 'non_conform'"/>
+
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_results" type="object"
+                                class="oe_stat_button" icon="fa-bar-chart">
+                            <field name="result_count" widget="statinfo" string="Measurements"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <group>
+                        <group string="Analysis">
+                            <field name="sample_id"/>
+                            <field name="parameter_id"/>
+                            <field name="method_id" domain="[('id', 'in', parameter_id.method_ids)]"/>
+                            <field name="equipment_id"/>
+                        </group>
+                        <group string="Assignment">
+                            <field name="analyst_id"/>
+                            <field name="validator_id" readonly="1"/>
+                            <field name="date_planned"/>
+                            <field name="date_start" readonly="1"/>
+                            <field name="date_end" readonly="1"/>
+                            <field name="duration" readonly="1" widget="float_time"/>
+                        </group>
+                    </group>
+
+                    <group string="Result">
+                        <group>
+                            <field name="is_qualitative" widget="boolean_toggle"/>
+                            <field name="qualitative_result" invisible="not is_qualitative"/>
+                            <label for="final_value" invisible="is_qualitative"/>
+                            <div class="o_row" invisible="is_qualitative">
+                                <field name="final_value" nolabel="1"/>
+                                <button name="action_compute_final_value" type="object"
+                                        string="↻ from measurements" class="btn-link"
+                                        invisible="measurement_used_count == 0"
+                                        help="Recompute the final value as the mean of the retained measurements"/>
+                            </div>
+                            <field name="mean_measurements" readonly="1" invisible="is_qualitative or measurement_used_count == 0"/>
+                            <field name="measurement_used_count" invisible="is_qualitative or measurement_used_count == 0"/>
+                            <field name="unit_id" readonly="1" invisible="is_qualitative"/>
+                            <field name="final_value_char" invisible="is_qualitative"
+                                   placeholder="Free text (e.g. &lt;LOD)"/>
+                        </group>
+                        <group string="Conformity Limits">
+                            <field name="limit_min" readonly="1"/>
+                            <field name="limit_max" readonly="1"/>
+                            <field name="conformity_state" widget="badge"
+                                   decoration-success="conformity_state == 'conform'"
+                                   decoration-danger="conformity_state == 'non_conform'"
+                                   decoration-warning="conformity_state == 'pending'"
+                                   decoration-info="conformity_state in ['below_lod', 'inconclusive']"/>
+                        </group>
+                    </group>
+
+                    <group string="Measurement Uncertainty (ISO 17025)">
+                        <field name="uncertainty"/>
+                        <field name="uncertainty_unit"/>
+                        <field name="confidence_level"/>
+                    </group>
+
+                    <notebook>
+                        <page string="Individual Measurements">
+                            <field name="result_ids">
+                                <list editable="bottom" string="Measurements">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="date_measurement"/>
+                                    <field name="measurement_type"/>
+                                    <field name="value"/>
+                                    <field name="dilution_factor"/>
+                                    <field name="value_corrected" readonly="1"/>
+                                    <field name="equipment_id"/>
+                                    <field name="is_outlier" widget="boolean"/>
+                                    <field name="outlier_reason" optional="hide"/>
+                                    <field name="is_used_for_result" widget="boolean"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Quality Control (QC)">
+                            <group>
+                                <field name="is_qc_required" widget="boolean_toggle"/>
+                                <field name="qc_sample_type" invisible="not is_qc_required"/>
+                                <field name="qc_result" invisible="not is_qc_required"/>
+                                <field name="qc_accepted" widget="boolean_toggle" invisible="not is_qc_required"/>
+                                <field name="qc_note" invisible="not is_qc_required"/>
+                            </group>
+                        </page>
+
+                        <page string="Observations">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_lims_analysis_list" model="ir.ui.view">
+        <field name="name">lims.analysis.list</field>
+        <field name="model">lims.analysis</field>
+        <field name="arch" type="xml">
+            <list string="Analyses"
+                  decoration-danger="conformity_state == 'non_conform'"
+                  decoration-success="conformity_state == 'conform'">
+                <field name="name"/>
+                <field name="sample_id"/>
+                <field name="parameter_id"/>
+                <field name="method_id" optional="show"/>
+                <field name="analyst_id"/>
+                <field name="date_planned" optional="show"/>
+                <field name="final_value"/>
+                <field name="unit_id" readonly="1"/>
+                <field name="conformity_state" widget="badge"
+                       decoration-success="conformity_state == 'conform'"
+                       decoration-danger="conformity_state == 'non_conform'"
+                       decoration-warning="conformity_state == 'pending'"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'validated'"
+                       decoration-info="state == 'in_progress'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_lims_analysis_search" model="ir.ui.view">
+        <field name="name">lims.analysis.search</field>
+        <field name="model">lims.analysis</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="sample_id"/>
+                <field name="parameter_id"/>
+                <field name="analyst_id"/>
+                <filter name="my_analyses" string="My Analyses"
+                        domain="[('analyst_id', '=', uid)]"/>
+                <filter name="to_validate" string="To Validate"
+                        domain="[('state', '=', 'results_entered')]"/>
+                <filter name="non_conform" string="Non Conform"
+                        domain="[('conformity_state', '=', 'non_conform')]"/>
+                <group>
+                    <filter name="group_parameter" string="Parameter" context="{'group_by': 'parameter_id'}"/>
+                    <filter name="group_sample" string="Sample" context="{'group_by': 'sample_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_lims_analysis" model="ir.actions.act_window">
+        <field name="name">Analyses</field>
+        <field name="res_model">lims.analysis</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_lims_analysis_search"/>
+    </record>
+</odoo>

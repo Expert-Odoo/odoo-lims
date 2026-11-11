@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ─── Results ───────────────────────────────────────────── -->
+    <record id="view_lims_result_list" model="ir.ui.view">
+        <field name="name">lims.result.list</field>
+        <field name="model">lims.result</field>
+        <field name="arch" type="xml">
+            <list string="Results" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="analysis_id"/>
+                <field name="date_measurement"/>
+                <field name="measurement_type"/>
+                <field name="value"/>
+                <field name="dilution_factor"/>
+                <field name="value_corrected" readonly="1"/>
+                <field name="unit_id" readonly="1"/>
+                <field name="equipment_id" optional="show"/>
+                <field name="is_outlier" widget="boolean"/>
+                <field name="is_used_for_result" widget="boolean"/>
+                <field name="note" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_lims_result" model="ir.actions.act_window">
+        <field name="name">Measurement Results</field>
+        <field name="res_model">lims.result</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>
