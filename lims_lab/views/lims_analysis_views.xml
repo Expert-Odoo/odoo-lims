@@ -93,7 +93,7 @@
                     <notebook>
                         <page string="Individual Measurements">
                             <field name="result_ids">
-                                <list editable="bottom" string="Measurements">
+                                <tree editable="bottom" string="Measurements">
                                     <field name="sequence" widget="handle"/>
                                     <field name="date_measurement"/>
                                     <field name="measurement_type"/>
@@ -104,7 +104,7 @@
                                     <field name="is_outlier" widget="boolean"/>
                                     <field name="outlier_reason" optional="hide"/>
                                     <field name="is_used_for_result" widget="boolean"/>
-                                </list>
+                                </tree>
                             </field>
                         </page>
 
@@ -123,7 +123,11 @@
                         </page>
                     </notebook>
                 </sheet>
-                <chatter/>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
             </form>
         </field>
     </record>
@@ -132,7 +136,7 @@
         <field name="name">lims.analysis.list</field>
         <field name="model">lims.analysis</field>
         <field name="arch" type="xml">
-            <list string="Analyses"
+            <tree string="Analyses"
                   decoration-danger="conformity_state == 'non_conform'"
                   decoration-success="conformity_state == 'conform'">
                 <field name="name"/>
@@ -150,7 +154,7 @@
                 <field name="state" widget="badge"
                        decoration-success="state == 'validated'"
                        decoration-info="state == 'in_progress'"/>
-            </list>
+            </tree>
         </field>
     </record>
 
@@ -181,7 +185,7 @@
     <record id="action_lims_analysis" model="ir.actions.act_window">
         <field name="name">Analyses</field>
         <field name="res_model">lims.analysis</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">tree,form</field>
         <field name="search_view_id" ref="view_lims_analysis_search"/>
     </record>
 </odoo>

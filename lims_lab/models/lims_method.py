@@ -65,10 +65,9 @@ class LimsMethod(models.Model):
     def action_obsolete(self):
         self.state = 'obsolete'
 
-    _code_unique = models.Constraint(
-        'unique(code, version)',
-        'The method code/version pair must be unique.',
-    )
+    _sql_constraints = [
+        ('code_unique', 'unique(code, version)', 'The method code/version pair must be unique.'),
+    ]
 
 
 class LimsMatrix(models.Model):

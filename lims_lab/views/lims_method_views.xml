@@ -51,7 +51,11 @@
                         </page>
                     </notebook>
                 </sheet>
-                <chatter/>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
             </form>
         </field>
     </record>
@@ -60,7 +64,7 @@
         <field name="name">lims.method.list</field>
         <field name="model">lims.method</field>
         <field name="arch" type="xml">
-            <list string="Analytical Methods">
+            <tree string="Analytical Methods">
                 <field name="name"/>
                 <field name="code"/>
                 <field name="method_type"/>
@@ -71,14 +75,14 @@
                 <field name="state" widget="badge"
                        decoration-success="state == 'validated'"
                        decoration-muted="state == 'obsolete'"/>
-            </list>
+            </tree>
         </field>
     </record>
 
     <record id="action_lims_method" model="ir.actions.act_window">
         <field name="name">Analytical Methods</field>
         <field name="res_model">lims.method</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">tree,form</field>
         <field name="domain">[('active', '=', True)]</field>
     </record>
 
@@ -87,18 +91,18 @@
         <field name="name">lims.matrix.list</field>
         <field name="model">lims.matrix</field>
         <field name="arch" type="xml">
-            <list string="Matrices" editable="bottom">
+            <tree string="Matrices" editable="bottom">
                 <field name="name"/>
                 <field name="code"/>
                 <field name="description"/>
                 <field name="active" widget="boolean_toggle"/>
-            </list>
+            </tree>
         </field>
     </record>
 
     <record id="action_lims_matrix" model="ir.actions.act_window">
         <field name="name">Matrices</field>
         <field name="res_model">lims.matrix</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">tree,form</field>
     </record>
 </odoo>

@@ -56,7 +56,11 @@
                         </page>
                     </notebook>
                 </sheet>
-                <chatter/>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
             </form>
         </field>
     </record>
@@ -65,7 +69,7 @@
         <field name="name">lims.equipment.list</field>
         <field name="model">lims.equipment</field>
         <field name="arch" type="xml">
-            <list string="Equipment"
+            <tree string="Equipment"
                   decoration-warning="metrological_state in ['to_calibrate','to_verify']"
                   decoration-danger="metrological_state == 'out_of_service'">
                 <field name="name"/>
@@ -82,7 +86,7 @@
                 <field name="state" widget="badge"
                        decoration-success="state == 'active'"
                        decoration-danger="state == 'out_of_service'"/>
-            </list>
+            </tree>
         </field>
     </record>
 
@@ -112,7 +116,7 @@
     <record id="action_lims_equipment" model="ir.actions.act_window">
         <field name="name">Equipment</field>
         <field name="res_model">lims.equipment</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">tree,form</field>
         <field name="search_view_id" ref="view_lims_equipment_search"/>
     </record>
 </odoo>
