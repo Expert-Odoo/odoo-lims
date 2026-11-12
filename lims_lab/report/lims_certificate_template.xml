@@ -24,7 +24,7 @@
                                 </t>
                                 <br/>
                                 <small class="text-muted">Issued on:
-                                    <t t-esc="(o.date_results or fields.Datetime.now()).strftime('%Y-%m-%d')"/>
+                                    <t t-esc="(o.date_results or o.create_date).strftime('%Y-%m-%d')"/>
                                 </small>
                             </div>
                         </div>
@@ -179,7 +179,7 @@
                                 <t t-set="validators" t-value="o.analysis_ids.mapped('validator_id')"/>
                                 <t t-if="validators">
                                     <strong><t t-esc="validators[0].name"/></strong><br/>
-                                    <small><t t-esc="validators[0].job_title or 'Validating Analyst'"/></small>
+                                    <small><t t-esc="validators[0].function or 'Validating Analyst'"/></small>
                                 </t>
                                 <br/><br/>
                                 <p>Signature: ___________________________</p>
