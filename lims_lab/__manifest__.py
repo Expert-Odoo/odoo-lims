@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'LIMS - Laboratory Information Management System',
-    'version': '18.0.1.1.0',
+    'version': '18.0.1.1.1',
     'category': 'Laboratory',
     'summary': 'Complete laboratory management: samples, analyses, results, reports, invoicing and ISO 17025 compliance',
     'description': """
