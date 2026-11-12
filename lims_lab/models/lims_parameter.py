@@ -40,10 +40,9 @@ class LimsParameter(models.Model):
     active = fields.Boolean(default=True)
     note = fields.Html(string='Technical Notes')
 
-    _code_unique = models.Constraint(
-        'unique(code)',
-        'The parameter code must be unique.',
-    )
+    _sql_constraints = [
+        ('code_unique', 'unique(code)', 'The parameter code must be unique.'),
+    ]
 
 
 class LimsParameterCategory(models.Model):
