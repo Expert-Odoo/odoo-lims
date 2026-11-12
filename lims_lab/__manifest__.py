@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'LIMS - Laboratory Information Management System',
-    'version': '19.0.1.1.0',
+    'version': '20.0.1.1.0',
     'category': 'Laboratory',
     'summary': 'Complete laboratory management: samples, analyses, results, reports, invoicing and ISO 17025 compliance',
     'description': """
@@ -33,7 +33,7 @@
         # dans lims_security.xml (les deux fichiers sont committés séparément).
         'security/lims_category.xml',
         'security/lims_security.xml',
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
 
         # Data
         'data/lims_sequence_data.xml',

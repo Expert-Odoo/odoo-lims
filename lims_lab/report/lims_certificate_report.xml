@@ -6,7 +6,6 @@
         <field name="model">lims.sample</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">lims_lab.report_lims_certificate</field>
-        <field name="report_file">lims_lab.report_lims_certificate</field>
         <field name="print_report_name">'Certificate_' + (object.name or '').replace('/', '_')</field>
         <field name="binding_model_id" ref="model_lims_sample"/>
         <field name="binding_type">report</field>

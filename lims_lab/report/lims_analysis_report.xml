@@ -5,7 +5,6 @@
         <field name="model">lims.analysis</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">lims_lab.report_lims_analysis_sheet</field>
-        <field name="report_file">lims_lab.report_lims_analysis_sheet</field>
         <field name="print_report_name">'Analysis_' + (object.name or '').replace('/', '_')</field>
         <field name="binding_model_id" ref="model_lims_analysis"/>
         <field name="binding_type">report</field>
