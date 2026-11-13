@@ -149,6 +149,14 @@
                             <field name="note" placeholder="Internal notes..."/>
                             <field name="attachment_ids" widget="many2many_binary"/>
                         </page>
+                    <!-- Customize / Expodo services -->
+                        <page string="Customize" name="customize">
+                            <div class="alert alert-info" role="alert" style="max-width:760px;">
+                                <h4 class="mt-0">Tailor this module to your laboratory</h4>
+                                <p>This module is a generic base, ready to be adapted to your laboratory. Expodo can preload your parameters and methods, apply your branding to the certificate, build your accreditation workflow and integrate your instruments.</p>
+                                <p class="mb-0">Write to us at <a href="mailto:info@expodo.fr">info@expodo.fr</a> or visit <a href="https://expodo.fr/en/" target="_blank">expodo.fr</a>.</p>
+                            </div>
+                        </page>
                     </notebook>
                 </sheet>
 
